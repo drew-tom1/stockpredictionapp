@@ -11,10 +11,10 @@ COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy the current directory contents into the container at /app
-COPY stockprice.py .
+COPY server.py .
 
 # Make port 8000 available to the world outside this container
 EXPOSE 8000
 
 # Run app.py when the container launches
-CMD ["uvicorn", "stockprice:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]

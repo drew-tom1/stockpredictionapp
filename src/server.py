@@ -11,6 +11,8 @@ from pydantic import BaseModel
 from datetime import datetime, timedelta
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
+from bs4 import BeautifulSoup
+import requests
 
 
 app = FastAPI()
@@ -22,6 +24,9 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+class TickerRequest(BaseModel):
+    ticker: str
 
 class StockRequest(BaseModel):
     ticker: str
@@ -56,6 +61,11 @@ async def history(request: StockRequest):
 
     return stock_data_df.to_dict()
 
+@app.post('/performance')
+async def performance(request: TickerRequest):
+    stock = yf.Ticker(request.ticker)
+    stats = stock.info
+    return stats
 
 @app.post('/predict')
 async def predict(request: StockRequest):
@@ -99,6 +109,12 @@ async def predict(request: StockRequest):
     df_chart = pd.DataFrame({'Predicted': predictions.flatten()}, index=future_dates)
 
     return df_chart.to_dict()
+
+@app.post('/headlines')
+def get_headlines(company_name):
+    
+
+    return company_name
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
