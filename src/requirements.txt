@@ -7,3 +7,5 @@ numpy
 yfinance
 datetime
 pydantic
+bs4
+requests
