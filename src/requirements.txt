@@ -7,3 +7,5 @@ numpy
 yfinance
 datetime
 pydantic
+finnhub-python
+python-dotenv

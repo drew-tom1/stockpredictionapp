@@ -5,17 +5,23 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Input
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Query, Depends
 import uvicorn
 from pydantic import BaseModel
-from datetime import datetime, timedelta
+from datetime import datetime, date, timedelta
 from typing import Optional
 from fastapi.middleware.cors import CORSMiddleware
-from bs4 import BeautifulSoup
-import requests
+import finnhub
+from dotenv import load_dotenv
+import os
+import logging
 
+load_dotenv(dotenv_path='../.env')
 
 app = FastAPI()
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app.add_middleware(
     CORSMiddleware,
@@ -33,6 +39,14 @@ class StockRequest(BaseModel):
     start_date: str
     end_date: str
     future_days: Optional[int] = 7
+
+finnhub_key = os.getenv('FINNHUB_API_KEY')
+
+finnhub_client = finnhub.Client(api_key=finnhub_key)
+
+if not finnhub_key:
+    logger.error("API key not found in environment variables.")
+    raise RuntimeError("API key not found in environment variables.")
 
 def get_stock_data(ticker, start_date, end_date):
     try:
@@ -52,7 +66,10 @@ def create_sequences(data, look_back):
         y.append(data[i + look_back, 0])
     return np.array(X), np.array(y)
 
-@app.post('/history') # retrieve historical data and display
+def validate_query (ticker: str) -> TickerRequest:
+    return TickerRequest(ticker = ticker)
+
+@app.post('/history')
 async def history(request: StockRequest):
     stock_data = get_stock_data(request.ticker, request.start_date, request.end_date)
     stock_index = pd.date_range(start = request.start_date, periods = len(stock_data), freq = 'B')
@@ -110,11 +127,18 @@ async def predict(request: StockRequest):
 
     return df_chart.to_dict()
 
-@app.post('/headlines')
-def get_headlines(company_name):
-    
+@app.get('/headlines')
+def get_headlines(request: TickerRequest = Depends(validate_query)):
+    week = timedelta(days=7)
+    start = date.today() - week
+    end = date.today()
+    try:
+        news = finnhub_client.company_news(request.ticker, _from=str(start), to=str(end))
+        return news
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
-    return company_name
+
 
 if __name__ == "__main__":
     uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=True)
