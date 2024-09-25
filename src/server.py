@@ -5,7 +5,7 @@ from sklearn.preprocessing import RobustScaler
 from sklearn.model_selection import train_test_split
 from tensorflow.keras.models import Sequential
 from tensorflow.keras.layers import LSTM, Dense, Input
-from fastapi import FastAPI, HTTPException, Query, Depends
+from fastapi import FastAPI, HTTPException, Depends
 import uvicorn
 from pydantic import BaseModel
 from datetime import datetime, date, timedelta
