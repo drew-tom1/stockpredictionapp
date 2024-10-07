@@ -17,4 +17,4 @@ COPY server.py .
 EXPOSE 8080
 
 # Run app.py when the container launches
-CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080", "--reload"]
+CMD ["uvicorn", "server:app", "--host", "0.0.0.0", "--port", "8080"]
