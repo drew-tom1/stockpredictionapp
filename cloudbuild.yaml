@@ -1,6 +1,6 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/striking-gadget-437600-s5/stockpredictionapp', '.']
+    args: ['build', '-t', 'gcr.io/striking-gadget-437600-s5/stockpredictionapp', "-f", "src/Dockerfile", 'src']
 
   - name: 'gcr.io/cloud-builders/docker'
     args: ['push', 'gcr.io/striking-gadget-437600-s5/stockpredictionapp']
