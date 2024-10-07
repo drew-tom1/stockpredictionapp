@@ -18,6 +18,8 @@ steps:
       - --region
       - us-central1
       - --allow-unauthenticated
+      - --memory
+      - 1Gi
 
 images:
   - 'gcr.io/striking-gadget-437600/stockpredictionapp'
