@@ -1,0 +1,23 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['build', '-t', 'gcr.io/striking-gadget-437600/stockpredictionapp', '.']
+
+  - name: 'gcr.io/cloud-builders/docker'
+    args: ['push', 'gcr.io/striking-gadget-437600/stockpredictionapp']
+
+  - name: 'gcr.io/google.com/cloudsdktool/cloud-sdk'
+    entrypoint: gcloud
+    args:
+      - run
+      - deploy
+      - stockpredictionapp
+      - --image
+      - gcr.io/striking-gadget-437600/stockpredictionapp
+      - --platform
+      - managed
+      - --region
+      - us-central1
+      - --allow-unauthenticated
+
+images:
+  - 'gcr.io/striking-gadget-437600/stockpredictionapp'
