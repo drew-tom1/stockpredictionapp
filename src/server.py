@@ -16,7 +16,7 @@ from dotenv import load_dotenv
 import os
 import logging
 
-load_dotenv(dotenv_path='.env')
+load_dotenv(dotenv_path='../.env')
 
 app = FastAPI()
 
